@@ -205,8 +205,7 @@ class Chat(private val plugin: TABAdditions, config: ConfigurationFile) : Refres
         player.loadPropertyFromConfig(this, "chatprefix", "")
         player.loadPropertyFromConfig(this, "customchatname", player.name)
         player.loadPropertyFromConfig(this, "chatsuffix", "")
-        val exp = tab.placeholderManager.tabExpansion
-        placeholders.forEach { exp.setPlaceholderValue(player, it.getIdentifier(), it.getLastValue(player)) }
+        placeholders.forEach { player.expansionData.setPlaceholderValue(it.getIdentifier(), it.getLastValue(player)) }
     }
 
     override fun refresh(player: TabPlayer, force: Boolean) {}

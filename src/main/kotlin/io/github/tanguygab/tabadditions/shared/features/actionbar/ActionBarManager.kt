@@ -43,7 +43,7 @@ class ActionBarManager(private val plugin: TABAdditions) : RefreshableFeature(),
             val text = section.getString("text") ?: ""
             val condition = section.getString("condition")
 
-            if (text.isNotEmpty()) addUsedPlaceholders(PlaceholderManagerImpl.detectPlaceholders(text))
+            if (text.isNotEmpty()) PlaceholderManagerImpl.detectPlaceholders(text).forEach { identifier -> addUsedPlaceholder(identifier) }
             actionBars[bar] = ActionBarLine(
                 text,
                 if (condition == null) null
@@ -75,7 +75,7 @@ class ActionBarManager(private val plugin: TABAdditions) : RefreshableFeature(),
     fun getActionBar(player: TabPlayer) = actionBars.values.find { it.isConditionMet(player) }
 
     fun announceBar(player: TabPlayer, actionbar: String) {
-        addUsedPlaceholders(PlaceholderManagerImpl.detectPlaceholders(actionbar))
+        PlaceholderManagerImpl.detectPlaceholders(actionbar).forEach { identifier -> addUsedPlaceholder(identifier) }
         announcedBars[player] = actionbar
         refresh(player, true)
 

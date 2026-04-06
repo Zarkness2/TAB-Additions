@@ -1,5 +1,6 @@
 package io.github.tanguygab.tabadditions.shared.features.unlimitednametags.lines
 
+import io.github.tanguygab.tabadditions.shared.features.chat.ChatUtils
 import me.neznamy.tab.shared.Property
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -57,7 +58,7 @@ class NametagLineText(
             data.type["see-through"]?.update(force) { isSeeThrough = it.lowercase() in listOf("true", "yes") }
             data.type["shadowed"]?.update(force) { isShadowed = it.lowercase() in listOf("true", "yes") }
             data.type["opacity"]?.update(force) { textOpacity = it.toByteOrNull() ?: -1 }
-            data.type["text"]?.update(force) { text(if (it.isEmpty()) null else MiniMessage.miniMessage().deserialize(it)) }
+            data.type["text"]?.update(force) { text(if (it.isEmpty()) null else MiniMessage.miniMessage().deserialize(ChatUtils.toMMColors(it))) }
         }
     }
 }

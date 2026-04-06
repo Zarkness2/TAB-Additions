@@ -16,7 +16,6 @@ import me.neznamy.tab.shared.chat.component.TabTextComponent
 import me.neznamy.tab.shared.config.PropertyConfiguration
 import me.neznamy.tab.shared.config.file.ConfigurationFile
 import me.neznamy.tab.shared.config.file.YamlConfigurationFile
-import me.neznamy.tab.shared.event.impl.TabPlaceholderRegisterEvent
 import me.neznamy.tab.shared.features.PlaceholderManagerImpl
 import me.neznamy.tab.shared.features.types.TabFeature
 import me.neznamy.tab.shared.features.types.UnLoadable
@@ -44,7 +43,6 @@ class TABAdditions(
 
     fun load() {
         loadFiles()
-        tab.eventBus?.register(TabPlaceholderRegisterEvent::class.java) { onPlaceholderRegister(it) }
         reload()
         tab.eventBus?.register(TabLoadEvent::class.java){ platform.runTask { reload() } }
     }
@@ -117,28 +115,14 @@ class TABAdditions(
     }
 
     private fun loadPlaceholders() {
-        platform.registerPlaceholders(tab.placeholderManager)
-    }
-
-    private fun onPlaceholderRegister(e: TabPlaceholderRegisterEvent) {
-        val identifier = e.identifier
         val pm = tab.placeholderManager
-        if (identifier.startsWith("%rel_viewer:")) {
-            val placeholder = pm.getPlaceholder("%" + identifier.substring(12))
-
-            e.relationalPlaceholder = when (placeholder) {
-                is RelationalPlaceholderImpl -> BiFunction { viewer: TabPlayer, target: TabPlayer ->
-                    placeholder.getLastValue(
-                        target as me.neznamy.tab.shared.platform.TabPlayer,
-                        viewer as me.neznamy.tab.shared.platform.TabPlayer
-                    )
-                }
-                is PlayerPlaceholderImpl -> BiFunction { viewer: TabPlayer, _: TabPlayer ->
-                    placeholder.getLastValue(viewer as me.neznamy.tab.shared.platform.TabPlayer)
-                }
-                else -> e.relationalPlaceholder
-            }
-            return
+        platform.registerPlaceholders(pm)
+        pm.registerRelationalPlaceholder("%rel_viewer:[^%]*%".toPattern(), 1000) { identifier ->
+            val placeholder = pm.getPlaceholder(identifier.group())
+            if (placeholder is RelationalPlaceholderImpl) BiFunction { viewer, target -> placeholder.getLastValue(
+                target as me.neznamy.tab.shared.platform.TabPlayer,
+                viewer as me.neznamy.tab.shared.platform.TabPlayer
+            ) } else BiFunction { viewer, _ -> placeholder.getLastValue(viewer as me.neznamy.tab.shared.platform.TabPlayer) }
         }
     }
 

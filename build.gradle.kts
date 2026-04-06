@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.tanguygab"
-version = "2.1.4"
+version = "2.1.5"
 
 kotlin {
     jvmToolchain(21)
@@ -45,13 +45,15 @@ dependencies {
 }
 
 tasks.processResources {
+    val props = mapOf(
+        "version" to version,
+        "kotlinVersion" to libs.versions.kotlin.get(),
+        "adventurePlatformVersion" to libs.versions.adventure.platform.get(),
+        "adventureMiniMessageVersion" to libs.versions.adventure.minimessage.get()
+    )
+    inputs.properties(props)
     filesMatching(listOf("plugin.yml", "bungee.yml")) {
-        expand(
-            "version" to version,
-            "kotlinVersion" to libs.versions.kotlin.get(),
-            "adventurePlatformVersion" to libs.versions.adventure.platform.get(),
-            "adventureMiniMessageVersion" to libs.versions.adventure.minimessage.get()
-        )
+        expand(props)
     }
 }
 

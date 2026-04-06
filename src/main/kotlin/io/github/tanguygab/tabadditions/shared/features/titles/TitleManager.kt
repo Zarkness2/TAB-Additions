@@ -43,8 +43,9 @@ class TitleManager(private val plugin: TABAdditions) : RefreshableFeature(), UnL
 
             val title = section.getString("title") ?: ""
             val subtitle = section.getString("subtitle") ?: ""
-            addUsedPlaceholders(PlaceholderManagerImpl.detectPlaceholders(title))
-            addUsedPlaceholders(PlaceholderManagerImpl.detectPlaceholders(subtitle))
+            PlaceholderManagerImpl.detectPlaceholders(title)
+                .plus(PlaceholderManagerImpl.detectPlaceholders(subtitle))
+                .forEach { identifier -> addUsedPlaceholder(identifier) }
             titles[name] = Title(title, subtitle)
         }
 
@@ -80,7 +81,7 @@ class TitleManager(private val plugin: TABAdditions) : RefreshableFeature(), UnL
 
     fun announceTitle(player: TabPlayer, titleStr: String) {
         if (player.uniqueId in toggled) return
-        addUsedPlaceholders(PlaceholderManagerImpl.detectPlaceholders(titleStr))
+        PlaceholderManagerImpl.detectPlaceholders(titleStr).forEach { identifier -> addUsedPlaceholder(identifier) }
         val titleSplit = titleStr.split("\n")
         val title = Title(titleSplit[0], if (titleSplit.size > 1) titleSplit[1] else "")
         announcedTitles[player] = title
